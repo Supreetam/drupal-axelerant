@@ -1,0 +1,5 @@
+name: 'Drupal Test Module'
+type: module
+description: 'Custom Test Description'
+core_version_requirement: ^8.8.0 || ^9.0
+package: 'Custom'

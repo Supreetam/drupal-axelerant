@@ -1,0 +1,7 @@
+drupal_test.admin_settings:
+  path: '/page_json/{siteapikey}/{nid}'
+  defaults:
+    _controller: 'Drupal\drupal_test\Controller\RepresentNodeController::displayNodeInfo'
+    _title: 'Display Node Info'
+  requirements:
+    _permission: 'access content'

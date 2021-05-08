@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * @file
+ * drupal_test.module
+ */
+ 
+use Drupal\Core\Routing\RouteMatchInterface;
+ 
+ /**
+ * Implements hook_help().
+ */
+function drupal_test_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Module help for the drupal_test module.
+    case 'help.page.drupal_test':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('drupal_test module') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function drupal_test_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  // Checking and altering only Site Information form.
+  if ('system_site_information_settings' == $form_id) {
+    // Adding new field to store siteapikey.
+    $form['site_information']['siteapikey'] = [
+      '#type' => 'textfield',
+      '#title' => t('Site API Key'),
+      '#default_value' => \Drupal::config('system.site')->get('siteapikey') ?? t('No API Key yet'),
+      '#required' => TRUE,
+    ];
+
+    // Adding a custom submit handler to save siteapikey.
+    $form['actions']['submit']['#submit'][] = 'drupal_test_handle_custom_submit';
+    // Altering form submit button label.
+    $form['actions']['submit']['#value'] = t('Update Configuration');
+  }
+}
+
+/**
+ * Implements drupal_test_handle_custom_submit().
+ */
+function drupal_test_handle_custom_submit(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  // Fetching editable system.site config to store siteapikey value.
+  $config = \Drupal::service('config.factory')->getEditable('system.site');
+  $config->set('siteapikey', $form_state->getValue('siteapikey'));
+  $config->save();
+  
+  // Dsiplaying success message upon storing.
+  \Drupal::service('messenger')->addMessage(t('Site API Key has been saved with %that value', ['%that' => $form_state->getValue('siteapikey')]));
+}
